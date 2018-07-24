@@ -1,3 +1,4 @@
+//Äª¶ÓËã·¨
 #include<bits/stdc++.h>
 using namespace std;
 const int maxns = 1e6 + 5;

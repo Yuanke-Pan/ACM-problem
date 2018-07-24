@@ -1,3 +1,4 @@
+//主席树（函数式线段树）
 #include<bits/stdc++.h>
 using namespace std;
 const int maxn = 1e5 + 6;

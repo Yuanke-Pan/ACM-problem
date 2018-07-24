@@ -1,3 +1,4 @@
+//高斯消元
 #include<bits/stdc++.h>
 using namespace std;
 const int maxn = 305;
