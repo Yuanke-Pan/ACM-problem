@@ -1,38 +1,59 @@
-//主席树（函数式线段树）
+//主席树（函数式线段树)此为更改版本由于本人认为这个更好理解
 #include<bits/stdc++.h>
 using namespace std;
-const int maxn = 1e5 + 6;
-int n, m, cnt, root[maxn], a[maxn], x, y, k;
-struct node { int l, r, sum; }T[maxn * 40];
-vector<int> v;
-int getid(int x) { return lower_bound(v.begin(), v.end(), x) - v.begin() + 1; }
-void update(int l, int r, int &x, int y, int pos)
+
+const int maxn = 2e5 + 5;
+
+struct node
 {
-	T[++cnt] = T[y], T[cnt].sum++, x = cnt;//将节点进行部分重建
-	if (l == r) return;
-	int mid = (l + r) / 2;
-	if (mid >= pos) update(l, mid, T[x].l, T[y].l, pos);
-	else update(mid + 1, r, T[x].r, T[y].r, pos);
-}
-int query(int l, int r, int x, int y, int k)//这里的k很迷,换了个名字好像就不行
+	int s;
+	node *lc, *rc;
+}T[maxn * 40], *root[maxn], *cnt;//cnt在主席树中十分重要，其用来记录当前更新的节点，防止节点被重复写入
+
+int a[maxn], n;
+long long ans;
+
+node *update(node* u, int l, int r, int num)
 {
-	if (l == r) return l;
-	int mid = (l + r) / 2;
-	int sum = T[T[y].l].sum - T[T[x].l].sum;
-	if (sum >= k) return query(l, mid, T[x].l, T[y].l, k);
-	else return query(mid + 1, r, T[x].r, T[y].r, k - sum);
+	node *ret = ++cnt;//这里拿取一个新的节点
+	*ret = *u;//复制上一个节点的内容到新的节点
+	ret->s++;
+	if (l == r) return  ret;
+	int mid = (l + r) >> 1;
+	if (num>mid)//这里就体现了部分更新的思想如果有变化则更新，否则保持原样
+		ret->rc = update(ret->rc, mid + 1, r, num);
+	else
+		ret->lc = update(ret->lc, l, mid, num);
+	return ret;
 }
+
+int query(node* u, node* v, int l, int r, int num)
+{
+	if (num <= l) return v->s - u->s;//这一步是根据题意来的。。。
+	int mid = (l + r) >> 1, an = query(u->rc, v->rc, m id + 1, r, num);
+	if (mid >= num) an += query(u->lc, v->lc, l, mid, num);
+	return an;
+}
+
 int main()
 {
-	cin >> n >> m;
+	scanf("%d", &n);
 	for (int i = 1; i <= n; i++)
-		cin >> a[i], v.push_back(a[i]);
-	sort(v.begin(), v.end()), v.erase(unique(v.begin(), v.end()), v.end());
-	for (int i = 1; i <= n; i++) update(1, n, root[i], root[i - 1], getid(a[i]));
-	for (int i = 1; i <= m; i++)
 	{
-		cin >> x >> y >> k;
-		cout << v[query(1, n, root[x - 1], root[y], k) - 1] << endl;
+		scanf("%d", a + i);
+		if (a[i]>n) a[i] = n;
 	}
+	root[0] = T->lc = T->rc = cnt = T;
+	T->s = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		root[i] = update(root[i - 1], 1, n, a[i]);
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		if (a[i]>i)
+			ans += (long long)query(root[i], root[a[i]], 1, n, i);
+	}
+	printf("%lld\n", ans);
 	return 0;
 }
